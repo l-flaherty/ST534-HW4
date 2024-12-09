@@ -1,0 +1,364 @@
+\documentclass[12pt, letterpaper]{article}
+\usepackage[left=2.5cm,right=2.5cm, top=2.5cm, bottom=2.5cm]{geometry}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhead[R]{Flaherty, \thepage}
+\renewcommand{\headrulewidth}{2pt}
+\setlength{\headheight}{15pt}
+\usepackage{lipsum}
+\usepackage{amsmath}
+\usepackage[makeroom]{cancel}
+\usepackage{cancel}
+\usepackage{array,polynom}
+\newcolumntype{C}{>{{}}c<{{}}} % for '+' and '-' symbols
+\newcolumntype{R}{>{\displaystyle}r} % automatic display-style math mode 
+\usepackage{xcolor}
+\newcommand\Ccancel[2][black]{\renewcommand\CancelColor{\color{#1}}\cancel{#2}}
+% Define a custom environment for examples with an indent
+
+\newenvironment{ex}{
+	\par\smallskip % Add some vertical space before the example
+	\noindent\textit{Example:\hspace{-0.25em}}
+	\leftskip=0.5em % Set the left indent to 1em (adjust as needed)
+}{
+	\par\smallskip % Add some vertical space after the example
+	\leftskip=0em % Reset the left indent
+}
+
+\newenvironment{nonex}{
+	\par\smallskip % Add some vertical space before the example
+	\noindent\textit{Non-example:\hspace{-0.25em}}
+	\leftskip=0.5em % Set the left indent to 1em (adjust as needed)
+}{
+	\par\smallskip % Add some vertical space after the example
+	\leftskip=0em % Reset the left indent
+}
+\newcommand{\mymatrix}[1]{
+	\renewcommand{\arraystretch}{0.5} % Adjust vertical spacing%
+	\setlength\arraycolsep{3pt}       % Adjust horizontal spacing%
+	\scalebox{0.90}{                  % Change font size%
+		$\begin{bmatrix}
+			#1
+		\end{bmatrix}$
+	}                   
+	\renewcommand{\arraystretch}{1.0} % Reset vertical spacing
+	\setlength\arraycolsep{6pt}       %Adjust horizontal spacing%
+}
+
+\usepackage{amssymb}
+\usepackage{bbm}
+\usepackage{mathrsfs}
+\usepackage[toc]{glossaries}
+\usepackage{amsthm}
+\usepackage{indentfirst}
+\usepackage[utf8]{inputenc}
+\usepackage[thinc]{esdiff}
+\usepackage{graphicx}
+\graphicspath{{./images/}}
+\usepackage{subfig}
+\usepackage{chngcntr}
+\usepackage{placeins}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{comment}
+\usepackage{sectsty}
+\sectionfont{\fontsize{15}{15}\selectfont}
+\usepackage{subcaption}
+\setlength\abovedisplayskip{0pt}
+\usepackage[hidelinks]{hyperref}
+\usepackage[nottoc,numbib]{tocbibind}
+\renewcommand{\qedsymbol}{\rule{0.7em}{0.7em}}
+\newcommand{\Mod}[1]{\ (\mathrm{mod}\ #1)}
+\counterwithin{figure}{section}
+\usepackage{centernot}
+\usepackage{enumitem}
+\theoremstyle{definition}
+\newtheorem{exmp}{Example}
+\newtheorem{nonexmp}{Non-Example}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{definition}{Definition}[section]
+\newtheorem{lemma}{Lemma}[theorem]
+\numberwithin{equation}{section}
+\newcommand{\mydef}[1]{(Definition \ref{#1}, Page \pageref{#1})}
+\newcommand{\mytheorem}[1]{(Theorem \ref{#1}, Page \pageref{#1})}
+\newcommand{\mylemma}[1]{(Lemma \ref{#1}, Page \pageref{#1})}
+\newcommand{\clickableword}[2]{\hyperref[#1]{#2}}
+
+%underscript for operations%
+\newcommand{\+}[1]{+_{\scalebox{.375}{#1}}}
+\newcommand{\mult}[1]{\cdot_{\scalebox{.375}{#1}}}
+
+%blackboard for letters%
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\V}{\mathbb{V}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\K}{\mathbb{K}}
+\newcommand{\1}{\mathbbm{1}}
+\newcommand{\Prob}{\mathbb{P}}
+
+\title{Time Series HW \# 4}
+\author{Liam Flaherty}
+\date{\parbox{\linewidth}{\centering%
+		Professor Martin\endgraf\bigskip
+		NCSU: ST534-001\endgraf\bigskip
+		October 7, 2024 \endgraf}}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\newpage\clearpage\noindent
+
+
+\noindent\textbf{1) \boldmath{Analyze the third data set on Moodle.}}
+
+\vspace{\baselineskip}
+\noindent\textbf{\boldmath{a. Determine possible models for the data set using diagnostics such as the ACF, PACF, and white noise test. Include a unit root test and discuss those results as well. Include relevant plots and tables with your submission.}}
+\vspace{\baselineskip}
+
+Our first step is to plot the data. We show it in Figure \ref{Time Series Data} below. 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=12cm]{Plotting Data}
+	\caption{Posted Time Series Data}
+	\label{Time Series Data}
+\end{figure}
+
+There is no obvious change in variance. The data may have some trending (e.g. from time point 30 to 100), but it is not abundantly obvious either way. Additionally, there might be some seasonality (the gaps between local peaks and valleys is approximately equal).
+\vspace{\baselineskip}
+
+Before proceeding further, we should test if a model is needed in the first place (i.e. if the series is just a random walk). We use the Ljung-Box Q Test in Figure \ref{Initial White Noise} below at lags of 6 and 12 to determine if a fit is needed. With p-values near machine-epsilon, we can comfortably reject white-noise at any reasonable significance level $\alpha$.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=10cm]{Initial White Noise}
+	\caption{Ljung-Box Q Test For White Noise}
+	\label{Initial White Noise}
+\end{figure}
+
+Now that we know we need to fit a model, we use R's built in ACF() and PACF() functions to get an idea of which models we want to try fitting. The code is shown in Figure \ref{Data3 ACF PACF R Code} below.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=10cm]{Data3 ACF PACF R Code}
+	\caption{R Code For ACF And PACF Functions}
+	\label{Data3 ACF PACF R Code}
+\end{figure}
+
+The plots in Figure \ref{Data3 ACF PACF} are the result. Notice how the ACF dies out slowly, while the PACF seems to significantly cut off at the second lag; a natural choice for our model is an AR(2). While that second lag has the largest partial autocorrelation, the PACF does not completely die out. To account for the PACF's reluctance to cut off, some type of ARIMA model may be necessary.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=12cm]{Data3 ACF PACF}
+	\caption{Autocorrelation And Partial Autocorrelation Of Data}
+	\label{Data3 ACF PACF}
+\end{figure}
+
+To test if a difference is needed, we use the Augmented Dickey-Fuller Test in Figure \ref{ADF Root} below. Under a significance level of $\alpha=0.05$, we fail to reject the null hypothesis of ``there is a unit root" ($p=0.21$). As such, we will fit ARIMA models in addition to our AR(2).
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=12cm]{Data3 Unit Root}
+	\caption{R Code For Augmented Dickey-Fuller Test}
+	\label{ADF Root}
+\end{figure}
+
+
+
+
+\vspace{\baselineskip}
+\noindent\textbf{\boldmath{b. Fit the models that you identified as good possibilities and compare their fits using output diagnostics such as the residual test for white noise, AIC, SBC, etc.}}
+\vspace{\baselineskip}
+
+After differencing the time series like indicated in the above, we see the following series.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=12cm]{Differenced TS}
+	\caption{Plot Of Differenced Time Series}
+	\label{Differenced TS}	
+\end{figure}
+
+At least visually, this series shows better signs of weak stationarity than our first plot. Nevertheless we will proceed with our fitting of an AR(2) for comparison purposes.
+\vspace{\baselineskip}
+
+The ACF and PACF for the residuals of the AR(2) model, plotted in Figure \ref{AR(2) Residual ACF} still show signs of a signal.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=12cm]{AR(2) Residual ACF}
+	\caption{AR(2) Residual ACF and PACF}
+	\label{AR(2) Residual ACF}
+\end{figure}
+
+Our model diagnostics show that one cannot reject the presence of a signal at any significance level greater than $\alpha=0.01$. The AIC for the model is about 314 while the BIC is about 325. These results are shown in Figure \ref{AR(2) Model Diagnostics} below.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=12cm]{AR(2) Model Diagnostics}
+	\caption{AR(2) Model Diagnostics}
+	\label{AR(2) Model Diagnostics}
+\end{figure}
+
+We can now try a variety of ARIMA models to see which one gives us the best fit. The model diagnostics are shown in Figure \ref{ARIMA Model Diagnostics}. The best model, in terms of all three of AIC (285.56), BIC (295.94), and Ljung-Box Q Test ($p=0.48$), is an ARIMA(2,1,1) model.
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=11.5cm]{ARIMA Model Diagnostics}
+	\caption{ARIMA Model Diagnostics}
+	\label{ARIMA Model Diagnostics}
+\end{figure} 
+
+We see the ACF and PACF of the residuals for our ARIMA(2,1,1) model in Figure \ref{ARIMA(2,1,1) Residual ACF}.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=10cm]{ARIMA(2,1,1) Residual ACF}
+	\caption{ARIMA(2,1,1) Residual ACF}
+	\label{ARIMA(2,1,1) Residual ACF}
+\end{figure} 
+
+
+
+\vspace{\baselineskip}
+\noindent\textbf{\boldmath{c. Use your model to forecast the series 12 time units into the future.}}
+\vspace{\baselineskip}
+
+In totality, our model is $(1-0.214B+0.3056B^2)(1-B)Z_t=(1+0.6546)a_t$. The results come from the code in Figure \ref{ARIMA(2,1,1) Coef} below.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=12cm]{ARIMA(2,1,1) Coef}
+	\caption{Coefficients Of ARIMA(2,1,1) Model}
+	\label{ARIMA(2,1,1) Coef}
+\end{figure}
+
+We can forecast the next 12 time units into the future with R's predict() function. The $101^{\text{st}}$ value is predicted to be about 8.15, the $102^{\text{nd}}$ value is predicted to be about 8.05, and so on until the $112^{\text{th}}$ value is predicted to be about 8.00.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=12cm]{ARIMA(2,1,1) Pred}
+	\caption{Forecast Next 12 Values From ARIMA(2,1,1)}
+	\label{ARIMA(2,1,1) Pred}
+\end{figure}
+
+
+
+
+
+
+
+\newpage
+\noindent\textbf{\boldmath{2) Consider the AR(2) model $(1-1.2B+0.6B^2)(Z_t-65)=a_t$ where $\sigma_a^2=1$ and we have the observations are $Z_{76}=60.4, Z_{77}=58.9, Z_{78}=64.7, Z_{79}=70.4, \text{ and } Z_{80}=62.6$.}}
+
+\vspace{\baselineskip}
+\noindent\textbf{\boldmath{a. Forecast $Z_{81}$, $Z_{82}$, $Z_{83}$, and $Z_{84}$.}}
+\vspace{\baselineskip}
+
+We first write out the model as $Z_t=65+1.2(Z_{t-1}-65)-0.6(Z_{t-2}-65)+a_t$. Our forecast for $l$ steps in the future is: $\widehat{Z_{80}}(l)=65+1.2(\widehat{Z_{80+l-1}}-65)-0.6(\widehat{Z_{80+l-2}}-65)$. Explicitly:
+
+\vspace{-0.5cm}
+\begin{align*}
+	\widehat{Z_{80}}(1)&=65+1.2(62.6-65)-0.6(70.4-65)=58.88\\
+	\widehat{Z_{80}}(2)&=65+1.2(58.88-65)-0.6(62.6-65)=59.096\\
+	\widehat{Z_{80}}(3)&=65+1.2(59.096-65)-0.6(58.88-65)=61.5872\\
+	\widehat{Z_{80}}(4)&=65+1.2(61.5872-65)-0.6(59.096-65)=64.44704
+\end{align*}	
+\vspace{-0.75cm}
+	
+\vspace{\baselineskip}
+\noindent\textbf{\boldmath{b. Determine the 95\% forecast limits for the forecasts in part a.}}
+\vspace{\baselineskip}
+
+The standard error for our forecast is given by $\sqrt{\sum\limits_{j=0}^{l-1}\psi_j^2}$. This follows from the fact that $\V(e_n(l))=\sigma_a^2\sum\limits_{j=0}^{l-1}\psi_j^2$ and we are given $\sigma_a^2=\sigma_a=1$. The critical value is $z_{\alpha/2}$ which is the value with $\frac{\alpha}{2}$ of the mass of the standard normal distribution to it's right (a choice of $\alpha=0.05$ yields about 1.96). It remains to be seen what our $\psi$ weights are from the MA representation of the above model. We can write out our model as $(1-1.2B+0.6B^2)(1+\psi_1B+\psi_2B^2+\cdots)a_t=a_t$. Equating the B coefficients, we find (where $n \geq 3$):
+
+\vspace{-0.5cm}
+\begin{align*}
+	&\psi_1B-1.2B=0 \implies \psi_1=1.2\\
+	&\psi_2B^2-1.2\psi_1B^2+0.6B^2=0 \implies \psi_2=1.2(1.2)-0.6=0.86\\
+	&\psi_nB^n-1.2\psi_{n-1}B^{n}+0.6\psi_{n-2}B^{n} \implies \psi_n=1.2\psi_{n-1}-0.6\psi_{n-2}
+\end{align*}
+
+Then the forecast limits (point-estimate plus/minus margin of error) are approximately:
+
+\vspace{-0.5cm}
+\begin{align*}
+	\widehat{Z_{80}}(1)&: 58.88 \pm 1.96 \left(\sum_{j=0}^{0}\psi_j^2\right)^{1/2} \approx 58.88 \pm 1.96 \left(1\right)^{\frac{1}{2}}\approx(56.92, 60.84)\\
+	\widehat{Z_{80}}(2)&: 59.10 \pm 1.96 \left(\sum_{j=0}^{1}\psi_j^2\right)^{1/2}\approx 59.10 \pm 1.96 \left(1^2+1.2^2\right)^{\frac{1}{2}}\approx(56.03, 62.16)\\
+	\widehat{Z_{80}}(3)&: 61.59 \pm 1.96 \left(\sum_{j=0}^{2}\psi_j^2\right)^{1/2}\approx 61.59 \pm 1.96 \left(1^2+1.2^2+0.86^2\right)^{\frac{1}{2}}\approx(58.09, 65.08)\\
+	\widehat{Z_{80}}(4)&: 64.45 \pm 1.96 \left(\sum_{j=0}^{3}\psi_j^2\right)^{1/2}\approx 64.45 \pm 1.96 \left(1^2+1.2^2+0.86^2+0.312^2\right)^{\frac{1}{2}}\approx(60.90, 68.00)
+\end{align*}
+
+
+
+\vspace{\baselineskip}
+\noindent\textbf{\boldmath{c. Suppose that the observations at $t=81$ turns out to be $Z_{81}=62.2$. Determine the updated forecasts $Z_{82}$ , $Z_{83}$, and $Z_{84}$.}}
+\vspace{\baselineskip}
+
+We have:
+
+\vspace{-0.5cm}
+\begin{align*}
+	\widehat{Z_{81}}(1)&=\widehat{Z_{80}}(2)+\psi_1\left[Z_{81}-\widehat{Z_{80}}(1)\right]\\
+	&=59.096+1.2\left[62.2-58.88\right]\\
+	&=63.08\\
+	\widehat{Z_{81}}(2)&=\widehat{Z_{80}}(3)+\psi_2\left[Z_{81}-\widehat{Z_{80}}(1)\right]\\
+	&=61.5872+0.86\left[62.2-58.88\right]\\
+	&=64.4424\\
+	\widehat{Z_{81}}(3)&=\widehat{Z_{80}}(4)+\psi_3\left[Z_{81}-\widehat{Z_{80}}(1)\right]\\
+	&=64.44704+0.312\left[62.2-58.88\right]\\
+	&=65.48288
+\end{align*}
+
+
+
+
+\newpage
+\noindent\textbf{\boldmath{3) A sales series was fitted by the ARIMA(2,1,0) model $(1-0.14B+0.48B^2)(1-B)Z_t=a_t$ where $\sigma_a^2=58000$ and the last three observations are $Z_{n-2}=640$, $Z_{n-1}=770$, and $Z_{n}=800$.}}
+
+\vspace{\baselineskip}
+\noindent\textbf{\boldmath{a. Calculate the forecast of the next three observations.}}
+\vspace{\baselineskip}
+
+We can write the model as $(1-0.14B+0.48B^2-B+0.14B^2-0.48B^3)Z_t=a_t$ or equivalently $Z_t=1.14Z_{t-1}-0.62Z_{t-2}+0.48Z_{t-3}+a_t$. Our forecast for $l$ steps in the future is: $\widehat{Z_{n}}(l)=1.14\widehat{Z_{n+l-1}}-0.62\widehat{Z_{n+l-2}}+0.48\widehat{Z_{n+l-3}}$. Explicitly:
+
+\vspace{-0.5cm}
+\begin{align*}
+	\widehat{Z_{n}}(1)&=1.14(800)-0.62(770)+0.48(640)=741.8\\
+	\widehat{Z_{n}}(2)&=1.14(741.8)-0.62(800)+0.48(770)=719.252\\
+	\widehat{Z_{n}}(3)&=1.14(719.252)-0.62(741.8)+0.48(800)=744.0313
+\end{align*}	
+\vspace{-0.75cm}
+
+
+\vspace{\baselineskip}
+\noindent\textbf{\boldmath{b. Calculate the 95\% forecast limits for the forecasts in part a.}}
+\vspace{\baselineskip}
+
+We know we can write $(1-1.14B+0.62B^2-048B^3)Z_t=a_t$. Writing $Z_t$ in terms of it's AR representation, we have $(1-1.14B+0.62B^2-048B^3)(1+\psi_1B+\psi_2B^2+\cdots)=a_t$. Equating coefficients of $B$, we arrive at our AR coefficients. We have:
+
+\vspace{-0.5cm}
+\begin{align*}
+	&\psi_1B-1.14B=0 \implies \psi_1=1.14\\
+	&\psi_2B^2-1.14\psi_1B^2+0.62B^2=0 \implies  \psi_2=1.14(1.14)-0.62=0.6796\\
+	&\psi_3B^3-1.14\psi_2B^3+0.62\psi_1B^3-0.48B^3=0 \implies  \psi_3=1.14(0.6796)+0.62(1.14)+0.48=1.961544
+\end{align*}
+
+Since $\V(e_n(l))=\sigma_a^2\sum\limits_{j=0}^{l-1}\psi_j^2$ and we are given $\sigma_a^2=58000$, our standard error is $240.8319\left(\sum\limits_{j=0}^{l-1}\psi_j^2\right)^{\frac{1}{2}}$. As such, our forecast limits are approximately:
+
+\vspace{-0.5cm}
+\begin{align*}
+	&\widehat{Z_n}(1): 741.8 \pm (1.96)240.8\left(\sum\limits_{j=0}^{0}\psi_j^2\right)^{\frac{1}{2}}\approx741.8 \pm 471.97\left(1^2\right)^{\frac{1}{2}}\approx(269.83, 1213.77)\\
+	&\widehat{Z_n}(2): 719.25 \pm (1.96)240.8\left(\sum\limits_{j=0}^{1}\psi_j^2\right)^{\frac{1}{2}}\approx719.25 \pm 471.97\left(1^2+1.14^2\right)^{\frac{1}{2}}\approx (3.54, 1434.96)\\
+	&\widehat{Z_n}(3): 744.03 \pm (1.96)240.8\left(\sum\limits_{j=0}^{2}\psi_j^2\right)^{\frac{1}{2}}\approx744.03 \pm 471.97\left(1^2+1.14^2+0.6796^2\right)^{\frac{1}{2}}\approx (-40.27, 1528.33)
+\end{align*}
+
+
+\end{document}
